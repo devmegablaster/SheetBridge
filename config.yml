@@ -4,11 +4,12 @@ database:
   host: ${POSTGRES_HOST}
   port: ${POSTGRES_PORT}
   user: ${POSTGRES_USER}
-  password: ${POSTGRES_PASS}
+  password: ${POSTGRES_PASSWORD}
   name: ${POSTGRES_DB}
 
 api:
   port: ${API_PORT}
+  version: "v1"
 
 auth:
   jwt_secret: ${JWT_SECRET}

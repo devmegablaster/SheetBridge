@@ -25,7 +25,8 @@ type DatabaseConfig struct {
 }
 
 type ApiConfig struct {
-	Port string `mapstructure:"port"`
+	Port    string `mapstructure:"port"`
+	Version string `mapstructure:"version"`
 }
 
 type AuthConfig struct {
