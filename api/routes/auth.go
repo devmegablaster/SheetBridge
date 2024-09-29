@@ -14,7 +14,6 @@ func registerAuthRoutes(g *echo.Group, cfg *RouterConfig) {
 	auth.GET("/google", authHandler.InitGoogleAuth)
 	auth.GET("/google/callback", authHandler.CallbackGoogleAuth)
 
-	// TODO: JWT
-	// auth.POST("/login", authHandler.GetJWT)
-
+	// INFO: Get JWT
+	auth.POST("/login", authHandler.Login)
 }

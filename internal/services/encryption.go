@@ -20,15 +20,14 @@ func NewEncryptionService(cfg config.CryptoConfig) *EncryptionService {
 	}
 }
 
+// INFO: Encrypts a string using AES encryption
 func (e *EncryptionService) Encrypt(plainText string) (string, error) {
 	block, err := aes.NewCipher([]byte(e.key))
-
 	if err != nil {
 		return "", err
 	}
 
 	gcm, err := cipher.NewGCM(block)
-
 	if err != nil {
 		return "", err
 	}
@@ -44,27 +43,24 @@ func (e *EncryptionService) Encrypt(plainText string) (string, error) {
 	return hex.EncodeToString(cipherText), nil
 }
 
+// INFO: Decrypts a string using AES encryption
 func (e *EncryptionService) Decrypt(cipherText string) (string, error) {
 	cipherTextBytes, err := hex.DecodeString(cipherText)
-
 	if err != nil {
 		return "", err
 	}
 
 	block, err := aes.NewCipher([]byte(e.key))
-
 	if err != nil {
 		return "", err
 	}
 
 	gcm, err := cipher.NewGCM(block)
-
 	if err != nil {
 		return "", err
 	}
 
 	nonceSize := gcm.NonceSize()
-
 	if len(cipherTextBytes) < nonceSize {
 		return "", err
 	}
@@ -72,7 +68,6 @@ func (e *EncryptionService) Decrypt(cipherText string) (string, error) {
 	nonce, cipherTextBytes := cipherTextBytes[:nonceSize], cipherTextBytes[nonceSize:]
 
 	plainText, err := gcm.Open(nil, nonce, cipherTextBytes, nil)
-
 	if err != nil {
 		return "", err
 	}

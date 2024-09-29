@@ -31,3 +31,8 @@ func (ur *UserRepository) GetById(id uuid.UUID) (*models.User, error) {
 	err := ur.dbSvc.DB.Where("id = ?", id).First(&u).Error
 	return &u, err
 }
+
+func (ur *UserRepository) UpdateAccessToken(u *models.User, accessToken string) error {
+	u.AccessToken = accessToken
+	return ur.dbSvc.DB.Save(u).Error
+}

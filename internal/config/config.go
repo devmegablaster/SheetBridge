@@ -31,6 +31,7 @@ type ApiConfig struct {
 
 type AuthConfig struct {
 	JWTSecret string       `mapstructure:"jwt_secret"`
+	JWTIssuer string       `mapstructure:"jwt_issuer"`
 	Google    GoogleConfig `mapstructure:"google"`
 }
 

@@ -19,6 +19,7 @@ type User struct {
 type UserResponse struct {
 	Id    string `json:"id" validate:"required"`
 	Email string `json:"email" validate:"required"`
+	JWT   string `json:"jwt"`
 }
 
 func (u *User) ToResponse() UserResponse {
