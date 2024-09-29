@@ -37,15 +37,23 @@ func (c *ConnectionRequest) ToConnection(userId uuid.UUID) Connection {
 }
 
 type ConnectionResponse struct {
-	Id             uuid.UUID      `json:"id" gorm:"primary_key;default:uuid_generate_v4();type:uuid"`
-	DatabaseConfig DatabaseConfig `json:"databaseConfig"`
-	Tables         []string       `json:"tables"`
+	Id             uuid.UUID              `json:"id" gorm:"primary_key;default:uuid_generate_v4();type:uuid"`
+	DatabaseConfig DatabaseConfigResponse `json:"databaseConfig"`
+	Tables         []string               `json:"tables"`
+}
+
+type DatabaseConfigResponse struct {
+	Id   string `json:"id"`
+	Host string `json:"host"`
 }
 
 func (c *Connection) ToResponse() ConnectionResponse {
 	return ConnectionResponse{
-		Id:             c.Id,
-		DatabaseConfig: c.DatabaseConfig,
-		Tables:         c.Tables,
+		Id:     c.Id,
+		Tables: c.Tables,
+		DatabaseConfig: DatabaseConfigResponse{
+			Id:   c.DatabaseConfig.Id.String(),
+			Host: c.DatabaseConfig.Host,
+		},
 	}
 }

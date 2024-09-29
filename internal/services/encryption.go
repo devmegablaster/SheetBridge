@@ -11,18 +11,18 @@ import (
 )
 
 type EncryptionService struct {
-	key string
+	key []byte
 }
 
 func NewEncryptionService(cfg config.CryptoConfig) *EncryptionService {
 	return &EncryptionService{
-		key: cfg.AESKey,
+		key: []byte(cfg.AESKey),
 	}
 }
 
 // INFO: Encrypts a string using AES encryption
 func (e *EncryptionService) Encrypt(plainText string) (string, error) {
-	block, err := aes.NewCipher([]byte(e.key))
+	block, err := aes.NewCipher(e.key)
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +50,7 @@ func (e *EncryptionService) Decrypt(cipherText string) (string, error) {
 		return "", err
 	}
 
-	block, err := aes.NewCipher([]byte(e.key))
+	block, err := aes.NewCipher(e.key)
 	if err != nil {
 		return "", err
 	}

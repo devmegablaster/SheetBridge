@@ -106,7 +106,7 @@ func (s *AuthService) NewJWT(user models.User) string {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(s.cfgAuth.JWTSecret)
+	tokenString, err := token.SignedString([]byte(s.cfgAuth.JWTSecret))
 	if err != nil {
 		panic(err)
 	}
@@ -117,7 +117,7 @@ func (s *AuthService) NewJWT(user models.User) string {
 // INFO: Get claims from JWT
 func (s *AuthService) ParseJWT(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return s.cfgAuth.JWTSecret, nil
+		return []byte(s.cfgAuth.JWTSecret), nil
 	})
 	if err != nil {
 		return nil, err

@@ -39,7 +39,7 @@ func New(c *config.DatabaseConfig) *DatabaseSvc {
 }
 
 func autoMigrate(conn *gorm.DB) {
-	conn.AutoMigrate(&models.User{}, &models.Connection{}, &models.DatabaseConfig{})
+	conn.AutoMigrate(&models.User{}, &models.Connection{}, &models.DatabaseConfig{}, &models.Synk{}, &models.Schema{})
 }
 
 func uuidExtension(conn *gorm.DB) {

@@ -7,7 +7,7 @@ import (
 )
 
 func registerConnectionRoutes(g *echo.Group, cfg *RouterConfig) {
-	connection := g.Group("/connection")
+	connection := g.Group("/connections")
 
 	authMiddleware := middlewares.NewAuth(cfg.DbSvc, cfg.Cfg)
 	g.Use(authMiddleware.Auth)

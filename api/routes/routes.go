@@ -14,4 +14,5 @@ type RouterConfig struct {
 func RegisterRoutes(g *echo.Group, cfg *RouterConfig) {
 	registerAuthRoutes(g, cfg)
 	registerConnectionRoutes(g, cfg)
+	registerSynkRoutes(g, cfg)
 }

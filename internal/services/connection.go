@@ -29,6 +29,19 @@ func (s *ConnectionService) CreateConnection(c *models.Connection) error {
 		return err
 	}
 
+	// TODO: Health check and get tables
+
+	// INFO: DatabaseConfig encryption
+	var err error
+	c.DatabaseConfig.Password, err = s.encryptionSvc.Encrypt(c.DatabaseConfig.Password)
+	c.DatabaseConfig.Username, err = s.encryptionSvc.Encrypt(c.DatabaseConfig.Username)
+	c.DatabaseConfig.Host, err = s.encryptionSvc.Encrypt(c.DatabaseConfig.Host)
+	c.DatabaseConfig.Port, err = s.encryptionSvc.Encrypt(c.DatabaseConfig.Port)
+	c.DatabaseConfig.Database, err = s.encryptionSvc.Encrypt(c.DatabaseConfig.Database)
+	if err != nil {
+		return err
+	}
+
 	return s.cr.CreateConnection(c)
 }
 
@@ -40,6 +53,7 @@ func (s *ConnectionService) GetConnections() ([]models.ConnectionResponse, error
 
 	connectionResponse := []models.ConnectionResponse{}
 	for _, c := range connections {
+		c.DatabaseConfig.Host, _ = s.encryptionSvc.Decrypt(c.DatabaseConfig.Host)
 		connectionResponse = append(connectionResponse, c.ToResponse())
 	}
 
