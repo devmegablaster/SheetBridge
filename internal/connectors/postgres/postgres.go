@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devmegablaster/SheetBridge/internal/broker"
 	"github.com/devmegablaster/SheetBridge/internal/config"
 	"github.com/devmegablaster/SheetBridge/internal/database"
 	"github.com/devmegablaster/SheetBridge/internal/models"
@@ -20,7 +19,6 @@ type PostgresConnection struct {
 	authSvc       *services.AuthService
 	userSvc       *services.UserService
 	connectionSvc *services.ConnectionService
-	producer      *broker.KafkaProducer
 }
 
 func NewPostgresConnection(conn *models.Connection, dbSvc *database.DatabaseSvc, cfg *config.Config, synk ...*models.Synk) (*PostgresConnection, error) {
@@ -49,7 +47,6 @@ func NewPostgresConnection(conn *models.Connection, dbSvc *database.DatabaseSvc,
 				authSvc:       services.NewAuthService(dbSvc, cfg.Crypto, cfg.Auth),
 				userSvc:       services.NewUserService(dbSvc),
 				connectionSvc: connSvc,
-				producer:      broker.NewKafkaProducer(cfg.Kafka.WriteTopic, cfg.Kafka.Partition, cfg.Kafka),
 			},
 			nil
 	}

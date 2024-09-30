@@ -3,11 +3,11 @@ package connectors
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 	"strings"
 	"time"
 
+	"github.com/devmegablaster/SheetBridge/internal/broker"
 	"github.com/devmegablaster/SheetBridge/pb"
 	"google.golang.org/protobuf/proto"
 )
@@ -34,17 +34,17 @@ func (pc *PostgresConnection) InitTrigger() {
 }
 
 // TODO: Clean Up
-func (uc *PostgresConnection) TriggerRoutine() {
+func (uc *PostgresConnection) TriggerRoutine(producer *broker.KafkaProducer) {
 	if _, err := uc.DB.Exec(context.Background(), "LISTEN sheetbridge"); err != nil {
-		log.Fatalf("Failed to listen on channel: %v", err)
+		slog.Error("Failed to listen on channel", slog.String("error", err.Error()))
 	}
 
-	fmt.Println("Listening for changes...")
+	slog.Info("Trigger Listener initiated", slog.String("userId", uc.conn.UserId.String()), slog.String("synkId", uc.synk.Id.String()))
 
 	for {
 		notification, err := uc.DB.WaitForNotification(context.Background())
 		if err != nil {
-			log.Fatalf("Error waiting for notification: %v", err)
+			slog.Error("Error waiting for notification", slog.String("error", err.Error()))
 		}
 		if notification != nil {
 			fmt.Println("Received notification:", notification.Payload)
@@ -91,7 +91,7 @@ func (uc *PostgresConnection) TriggerRoutine() {
 
 			protoWriteData, err := proto.Marshal(&protoWrite)
 
-			uc.producer.Produce(protoWriteData)
+			producer.Produce(protoWriteData)
 		}
 
 		time.Sleep(1 * time.Second)

@@ -3,13 +3,13 @@ package connectors
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 )
 
 func (pc *PostgresConnection) GetTables() []string {
 	rows, err := pc.DB.Query(context.Background(), "SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
 	if err != nil {
-		log.Fatalf("Failed to get tables: %v", err)
+		slog.Error("Failed to get tables", slog.String("error", err.Error()))
 	}
 	defer rows.Close()
 
@@ -18,7 +18,7 @@ func (pc *PostgresConnection) GetTables() []string {
 	for rows.Next() {
 		var table string
 		if err := rows.Scan(&table); err != nil {
-			log.Fatalf("Failed to scan table: %v", err)
+			slog.Error("Failed to scan table", slog.String("error", err.Error()))
 		}
 
 		tables = append(tables, table)

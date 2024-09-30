@@ -30,6 +30,7 @@ func NewSynkConsumer(cfg *config.KafkaConfig, protoSynk chan *pb.Synk) *SynkCons
 	err = c.Subscribe(cfg.SynkTopic, nil)
 	if err != nil {
 		slog.Error("Unable to subscribe to synk topic")
+		os.Exit(1)
 	}
 
 	slog.Info("✅Synk consumer listening...")
@@ -45,11 +46,13 @@ func (s *SynkConsumer) Consume() {
 		msg, err := s.consumer.ReadMessage(-1)
 		if err != nil {
 			slog.Error("Unable to process kafka message", slog.String("error", err.Error()))
+			continue
 		}
 
 		protoSynk := &pb.Synk{}
 		if err := proto.Unmarshal(msg.Value, protoSynk); err != nil {
 			slog.Error("Unable to process kafka message", slog.String("message", string(msg.Value)))
+			continue
 		}
 
 		s.protoSynk <- protoSynk

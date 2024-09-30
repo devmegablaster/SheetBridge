@@ -20,7 +20,7 @@ func (s *SynkProcessor) init(protoSynk *pb.Synk) {
 	}
 
 	dbConn.InitTrigger()
-	go dbConn.TriggerRoutine()
+	go dbConn.TriggerRoutine(s.producer)
 }
 
 func (s *SynkProcessor) protoSynkToSynk(protoSynk *pb.Synk) *models.Synk {
