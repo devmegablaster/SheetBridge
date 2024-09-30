@@ -31,3 +31,9 @@ func (r *ConnectionRepository) GetConnectionById(id uuid.UUID) (*models.Connecti
 	err := r.dbSvc.DB.Preload("DatabaseConfig").Where("id = ?", id).First(&connection).Error
 	return &connection, err
 }
+
+func (r *ConnectionRepository) GetConnectionsByUserId(id uuid.UUID) ([]models.Connection, error) {
+	var connections []models.Connection
+	err := r.dbSvc.DB.Preload("DatabaseConfig").Where("user_id = ?", id).Find(&connections).Error
+	return connections, err
+}

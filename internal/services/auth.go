@@ -141,6 +141,16 @@ func (s *AuthService) GetUserIdFromJWT(tokenString string) (string, error) {
 	return claims["id"].(string), nil
 }
 
+// INFO: Returns decrypted access token
+func (s *AuthService) GetAccessToken(user models.User) string {
+	decryptedAccessToken, err := s.encryptionSvc.Decrypt(user.AccessToken)
+	if err != nil {
+		panic(err)
+	}
+
+	return decryptedAccessToken
+}
+
 // INFO: Refresh Google access token
 func (s *AuthService) RefreshAccessToken(user models.User) (string, error) {
 	decryptedRefreshToken, err := s.encryptionSvc.Decrypt(user.RefreshToken)

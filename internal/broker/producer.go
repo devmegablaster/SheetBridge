@@ -39,6 +39,8 @@ func NewKafkaProducer(topic string, partition int32, cfg config.KafkaConfig) *Ka
 		}
 	}()
 
+	slog.Info("✅Kafka producer started")
+
 	return &KafkaProducer{
 		producer:  producer,
 		topic:     topic,
