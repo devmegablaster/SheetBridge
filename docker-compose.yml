@@ -9,6 +9,19 @@ services:
       - ${API_PORT}:${API_PORT}
     depends_on:
       - db
+      - kafka
+      - zookeeper
+    restart: always
+
+  synkit:
+    build:
+      context: .
+      dockerfile: Dockerfile.synkit
+    container_name: synkit
+    depends_on:
+      - db
+      - kafka
+      - zookeeper
     restart: always
 
   db:
