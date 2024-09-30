@@ -10,7 +10,7 @@ message Write {
   WriteType write_type = 1;
   WriteData write_data = 2;
   string access_token = 3;
-  string sheet_name = 4;
+  string sheet_id = 4;
   string spreadsheet_id = 5;
   google.protobuf.Timestamp timestamp = 6;
 }

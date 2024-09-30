@@ -82,7 +82,7 @@ func (uc *PostgresConnection) TriggerRoutine(producer *broker.KafkaProducer) {
 			protoWrite := pb.Write{
 				WriteType:     pb.WriteType_WRITE_FULL,
 				SpreadsheetId: uc.synk.SpreadsheetId,
-				SheetName:     uc.synk.SheetId,
+				SheetId:       uc.synk.SheetId,
 				AccessToken:   accessToken,
 				WriteData: &pb.WriteData{
 					DynamicFields: keyValueList,
