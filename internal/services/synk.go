@@ -1,24 +1,32 @@
 package services
 
 import (
+	"log/slog"
+
+	"github.com/devmegablaster/SheetBridge/internal/broker"
+	"github.com/devmegablaster/SheetBridge/internal/config"
 	"github.com/devmegablaster/SheetBridge/internal/database"
 	"github.com/devmegablaster/SheetBridge/internal/models"
 	"github.com/devmegablaster/SheetBridge/internal/repository"
+	"github.com/devmegablaster/SheetBridge/pb"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/proto"
 )
 
 type SynkService struct {
-	dbSvc     *database.DatabaseSvc
-	sr        *repository.SynkRepository
-	validator *validator.Validate
+	dbSvc        *database.DatabaseSvc
+	sr           *repository.SynkRepository
+	validator    *validator.Validate
+	synkProducer *broker.KafkaProducer
 }
 
-func NewSynkService(dbSvc *database.DatabaseSvc) *SynkService {
+func NewSynkService(dbSvc *database.DatabaseSvc, kafkaCfg config.KafkaConfig) *SynkService {
 	return &SynkService{
-		dbSvc:     dbSvc,
-		sr:        repository.NewSynkRepository(dbSvc),
-		validator: validator.New(),
+		dbSvc:        dbSvc,
+		sr:           repository.NewSynkRepository(dbSvc),
+		validator:    validator.New(),
+		synkProducer: broker.NewKafkaProducer(kafkaCfg.SynkTopic, kafkaCfg.Partition, kafkaCfg),
 	}
 }
 
@@ -45,7 +53,19 @@ func (s *SynkService) CreateSynk(synk *models.Synk) error {
 		return err
 	}
 
-	// TODO: Produce message to kafka
+	protoSynk := pb.Synk{
+		Action: pb.Action_INIT,
+		Id:     synk.Id.String(),
+	}
+
+	bt, err := proto.Marshal(&protoSynk)
+	if err != nil {
+		slog.Error("Unable to marshal synk")
+		return err
+	}
+
+	// Produce message to kafka
+	s.synkProducer.Produce(bt)
 	return nil
 }
 

@@ -1,9 +1,9 @@
 up:
   docker-compose up -d
 
-build tag:
+buildapi tag:
   @echo "Building docker image with {{tag}} tag..."
-  docker build -t tag . -f docker/Dockerfile
+  docker build -t tag . -f Dockerfile.api
 
 dbclean:
   @echo "Cleaning database..."

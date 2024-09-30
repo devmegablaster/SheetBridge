@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package synk;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./";
+
+message Synk {
+  string id = 1;
+  Action action = 2;
+  Data data = 3;
+  google.protobuf.Timestamp timestamp = 4;
+}
+
+enum Action {
+    INIT = 0;
+    UPDATE = 1;
+    DELETE = 2;
+    PAUSE = 4;
+}
+
+message Data {
+  string key = 1;
+  string value = 2;
+}

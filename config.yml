@@ -28,6 +28,7 @@ crypto:
 
 kafka:
   broker: ${KAFKA_BROKER}
+  partition: 0
   synk_topic: synk_topic
   synk_group: synk_group
   write_topic: write_topic

@@ -48,6 +48,7 @@ type CryptoConfig struct {
 
 type KafkaConfig struct {
 	Broker     string `mapstructure:"broker"`
+	Partition  int32  `mapstructure:"partition"`
 	SynkTopic  string `mapstructure:"synk_topic"`
 	SynkGroup  string `mapstructure:"synk_group"`
 	WriteTopic string `mapstructure:"write_topic"`

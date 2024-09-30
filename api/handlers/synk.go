@@ -20,7 +20,7 @@ func NewSynkHandler(dbSvc *database.DatabaseSvc, cfg config.Config) *SynkHandler
 	return &SynkHandler{
 		dbSvc:   dbSvc,
 		cfg:     cfg,
-		synkSvc: services.NewSynkService(dbSvc),
+		synkSvc: services.NewSynkService(dbSvc, cfg.Kafka),
 	}
 }
 
