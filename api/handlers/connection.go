@@ -26,10 +26,13 @@ func NewConnectionHandler(dbSvc *database.DatabaseSvc, cfg config.Config) *Conne
 
 // TODO: Error Handling
 func (h *ConnectionHandler) CreateConnection(c echo.Context) error {
-	connection := models.Connection{}
-	if err := c.Bind(&connection); err != nil {
+	connectionRequest := models.ConnectionRequest{}
+	if err := c.Bind(&connectionRequest); err != nil {
 		return err
 	}
+
+	user := c.Get("user").(*models.User)
+	connection := connectionRequest.ToConnection(user.Id)
 
 	if err := h.connectionSvc.CreateConnection(&connection); err != nil {
 		return err
@@ -40,7 +43,9 @@ func (h *ConnectionHandler) CreateConnection(c echo.Context) error {
 
 // TODO: Error Handling
 func (h *ConnectionHandler) GetConnections(c echo.Context) error {
-	connections, err := h.connectionSvc.GetConnections()
+	user := c.Get("user").(*models.User)
+
+	connections, err := h.connectionSvc.GetConnectionsForUser(user)
 	if err != nil {
 		return err
 	}
