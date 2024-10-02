@@ -13,6 +13,9 @@ type SynkProcessor struct {
 	dbSvc         *database.DatabaseSvc
 	sr            *repository.SynkRepository
 	connectionSvc *services.ConnectionService
+	authSvc       *services.AuthService
+	userSvc       *services.UserService
+	encryptionSvc *services.EncryptionService
 	cfg           *config.Config
 	producer      *broker.KafkaProducer
 }
@@ -22,6 +25,9 @@ func NewSynkProcessor(dbSvc *database.DatabaseSvc, cfg *config.Config) *SynkProc
 		dbSvc:         dbSvc,
 		sr:            repository.NewSynkRepository(dbSvc),
 		connectionSvc: services.NewConnectionService(dbSvc, cfg.Crypto),
+		authSvc:       services.NewAuthService(dbSvc, cfg.Crypto, cfg.Auth),
+		userSvc:       services.NewUserService(dbSvc),
+		encryptionSvc: services.NewEncryptionService(cfg.Crypto),
 		cfg:           cfg,
 		producer:      broker.NewKafkaProducer(cfg.Kafka.WriteTopic, cfg.Kafka.Partition, cfg.Kafka),
 	}

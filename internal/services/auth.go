@@ -186,6 +186,8 @@ func (s *AuthService) RefreshAccessToken(user models.User) (string, error) {
 		return "", fmt.Errorf("failed to update access token: %w", err)
 	}
 
+	slog.Info("Refreshed access token", slog.String("email", user.Email))
+
 	return token["access_token"].(string), nil
 }
 

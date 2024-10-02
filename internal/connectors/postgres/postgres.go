@@ -12,13 +12,14 @@ import (
 )
 
 type PostgresConnection struct {
-	DB            *pgx.Conn
-	dbSvc         *database.DatabaseSvc
-	conn          *models.Connection
-	synk          *models.Synk
-	authSvc       *services.AuthService
-	userSvc       *services.UserService
-	connectionSvc *services.ConnectionService
+	DB             *pgx.Conn
+	dbSvc          *database.DatabaseSvc
+	conn           *models.Connection
+	synk           *models.Synk
+	authSvc        *services.AuthService
+	userSvc        *services.UserService
+	connectionSvc  *services.ConnectionService
+	transformerSvc *services.TransformerService
 }
 
 func NewPostgresConnection(conn *models.Connection, dbSvc *database.DatabaseSvc, cfg *config.Config, synk ...*models.Synk) (*PostgresConnection, error) {

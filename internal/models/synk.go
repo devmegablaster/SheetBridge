@@ -1,6 +1,10 @@
 package models
 
 import (
+	"database/sql/driver"
+	"errors"
+	"strings"
+
 	"github.com/devmegablaster/SheetBridge/internal/constants"
 	"github.com/google/uuid"
 )
@@ -17,14 +21,30 @@ type Synk struct {
 	Status        string     `json:"status" gorm:"type:varchar(255);not null" validate:"required"`
 	Message       string     `json:"message" gorm:"type:varchar(255);default:''"`
 	SchemaId      uuid.UUID  `json:"schemaId" gorm:"type:uuid;not null"`
-	Schema        Schema     `json:"schema" gorm:"foreignKey:SynkId;references:Id"`
+	Schema        Schema     `json:"schema" gorm:"foreignKey:SchemaId"`
 }
 
 type Schema struct {
-	Id     uuid.UUID `json:"id" gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
-	Col    []string  `json:"cols" gorm:"type:varchar(255)[]"`
-	Type   []string  `json:"types" gorm:"type:varchar(255)[]"`
-	SynkId uuid.UUID `json:"synkId" gorm:"type:uuid;not null" validate:"required"`
+	Id   uuid.UUID `json:"id" gorm:"primary_key;default:uuid_generate_v4();type:uuid"`
+	Col  ArrString `json:"cols" gorm:"type:varchar(255)"`
+	Type ArrString `json:"types" gorm:"type:varchar(255)"`
+}
+
+type ArrString []string
+
+func (o *ArrString) Scan(src any) error {
+	bytes, ok := src.([]byte)
+	if !ok {
+		return errors.New("src value cannot cast to []byte")
+	}
+	*o = strings.Split(string(bytes), ",")
+	return nil
+}
+func (o ArrString) Value() (driver.Value, error) {
+	if len(o) == 0 {
+		return nil, nil
+	}
+	return strings.Join(o, ","), nil
 }
 
 type SynkRequest struct {
@@ -42,6 +62,7 @@ func (sr *SynkRequest) ToSynk(userId uuid.UUID) *Synk {
 		SheetId:       sr.SheetId,
 		Table:         sr.Table,
 		Status:        constants.Synk.STATUS_INIT,
+		Schema:        Schema{},
 	}
 }
 

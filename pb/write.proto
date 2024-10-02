@@ -9,21 +9,21 @@ option go_package = "./";
 message Write {
   WriteType write_type = 1;
   WriteData write_data = 2;
-  string access_token = 3;
-  string sheet_id = 4;
-  string spreadsheet_id = 5;
-  google.protobuf.Timestamp timestamp = 6;
+  repeated string columns = 3;
+  string access_token = 4;
+  string sheet_id = 5;
+  string spreadsheet_id = 6;
+  google.protobuf.Timestamp timestamp = 7;
 }
 
 enum WriteType {
     WRITE_FULL = 0;
 }
 
-message KeyValue {
-    string key = 1;
-    string value = 2;
+message Value {
+  string value = 1;
 }
 
 message WriteData {
-    repeated KeyValue dynamic_fields = 1;
+    repeated Value values = 1;
 }

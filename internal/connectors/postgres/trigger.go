@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/devmegablaster/SheetBridge/internal/broker"
+	"github.com/devmegablaster/SheetBridge/internal/services"
 	"github.com/devmegablaster/SheetBridge/pb"
 	"google.golang.org/protobuf/proto"
 )
@@ -37,6 +38,7 @@ func (pc *PostgresConnection) InitTrigger() {
 func (uc *PostgresConnection) TriggerRoutine(producer *broker.KafkaProducer) {
 	if _, err := uc.DB.Exec(context.Background(), "LISTEN sheetbridge"); err != nil {
 		slog.Error("Failed to listen on channel", slog.String("error", err.Error()))
+		return
 	}
 
 	slog.Info("Trigger Listener initiated", slog.String("userId", uc.conn.UserId.String()), slog.String("synkId", uc.synk.Id.String()))
@@ -47,12 +49,11 @@ func (uc *PostgresConnection) TriggerRoutine(producer *broker.KafkaProducer) {
 			slog.Error("Error waiting for notification", slog.String("error", err.Error()))
 		}
 		if notification != nil {
-			fmt.Println("Received notification:", notification.Payload)
+			slog.Info("Notification received", slog.String("payload", notification.Payload))
 			user, err := uc.userSvc.GetUserById(uc.conn.UserId)
-			fmt.Println(uc.conn.UserId)
 			if err != nil {
 				slog.Error("Unable to get user from connection", slog.String("connectionId", uc.conn.Id.String()))
-				fmt.Println(err)
+				continue
 			}
 
 			accessToken, err := uc.authSvc.RefreshAccessToken(*user)
@@ -67,30 +68,9 @@ func (uc *PostgresConnection) TriggerRoutine(producer *broker.KafkaProducer) {
 			}
 
 			tableData, err := uc.GetTableData(uc.synk.Table)
-			var keyValueList []*pb.KeyValue
-
-			for _, row := range tableData {
-				for key, value := range row {
-					kv := pb.KeyValue{
-						Key:   key,
-						Value: fmt.Sprintf("%v", value),
-					}
-					keyValueList = append(keyValueList, &kv)
-				}
-			}
-
-			protoWrite := pb.Write{
-				WriteType:     pb.WriteType_WRITE_FULL,
-				SpreadsheetId: uc.synk.SpreadsheetId,
-				SheetId:       uc.synk.SheetId,
-				AccessToken:   accessToken,
-				WriteData: &pb.WriteData{
-					DynamicFields: keyValueList,
-				},
-			}
-
-			protoWriteData, err := proto.Marshal(&protoWrite)
-
+			transformerSvc := services.NewTransformerService(uc.synk.Schema.Col)
+			protoWrite := transformerSvc.TransformToWriteMessage(tableData, pb.WriteType_WRITE_FULL, uc.synk.SpreadsheetId, uc.synk.SheetId, accessToken)
+			protoWriteData, err := proto.Marshal(protoWrite)
 			producer.Produce(protoWriteData)
 		}
 

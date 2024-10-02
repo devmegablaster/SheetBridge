@@ -1,6 +1,8 @@
 package services
 
 import (
+	"log/slog"
+
 	"github.com/devmegablaster/SheetBridge/internal/config"
 	"github.com/devmegablaster/SheetBridge/internal/database"
 	"github.com/devmegablaster/SheetBridge/internal/models"
@@ -42,6 +44,8 @@ func (s *ConnectionService) CreateConnection(c *models.Connection) error {
 	if err != nil {
 		return err
 	}
+
+	slog.Info("Connection Info", slog.Any("Connection", c))
 
 	return s.cr.CreateConnection(c)
 }

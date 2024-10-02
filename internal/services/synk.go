@@ -48,8 +48,14 @@ func (s *SynkService) CreateSynkFromRequest(synkR *models.SynkRequest, userId uu
 
 // INFO: Create a new synk
 func (s *SynkService) CreateSynk(synk *models.Synk) error {
-	err := s.sr.CreateSynk(synk)
+	err := s.sr.CreateSchema(&synk.Schema)
 	if err != nil {
+		return err
+	}
+
+	synk.SchemaId = synk.Schema.Id
+
+	if err := s.sr.CreateSynk(synk); err != nil {
 		return err
 	}
 
@@ -82,4 +88,13 @@ func (s *SynkService) GetSynksForUser(userId uuid.UUID) ([]models.SynkResponse, 
 	}
 
 	return synkResponse, nil
+}
+
+func (s *SynkService) UpdateSchema(synk *models.Synk, schema *models.Schema) {
+	synk.Schema = *schema
+	if err := s.sr.UpdateSynk(synk); err != nil {
+		slog.Error("Unable to update synk schema", slog.String("synkId", synk.Id.String()))
+	}
+
+	slog.Info("Synk schema updated", slog.String("synkId", synk.Id.String()))
 }
