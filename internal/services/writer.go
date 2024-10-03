@@ -75,8 +75,6 @@ func (s *WriterService) WriteToSheet(writeRange string, valueRange *sheets.Value
 		return err
 	}
 
-	slog.Info("Data writter")
-
 	return nil
 }
 
